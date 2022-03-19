@@ -4,6 +4,8 @@
 
 package termui
 
+import "math"
+
 type gridItemType uint
 
 const (
@@ -139,10 +141,10 @@ func (self *Grid) Draw(buf *Buffer) {
 	for _, item := range self.Items {
 		entry, _ := item.Entry.(Drawable)
 
-		x := int(width*item.XRatio) + self.Min.X
-		y := int(height*item.YRatio) + self.Min.Y
-		w := int(width * item.WidthRatio)
-		h := int(height * item.HeightRatio)
+		x := int(math.Round(width*item.XRatio)) + self.Min.X
+		y := int(math.Round(height*item.YRatio)) + self.Min.Y
+		w := int(math.Round(width * item.WidthRatio))
+		h := int(math.Round(height * item.HeightRatio))
 
 		if x+w > self.Dx() {
 			w--
