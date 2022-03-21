@@ -175,6 +175,9 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal float64) {
 		image.Pt(self.Inner.Min.X+yAxisLabelsWidth, self.Inner.Max.Y-1),
 	)
 	// draw rest
+	if self.HorizontalScale == -1 {
+		return
+	}
 	for x := self.Inner.Min.X + yAxisLabelsWidth + (xAxisLabelsGap)*self.HorizontalScale + 1; x < self.Inner.Max.X-1; {
 		label := fmt.Sprintf(
 			"%d",
