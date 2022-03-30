@@ -120,7 +120,10 @@ func (self *Table) Draw(buf *Buffer) {
 			}
 
 			separatorXCoordinate += width
-			buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate))
+			// don't draw separator if we're on the last column
+			if i < len(columnWidths)-1 {
+				buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate))
+			}
 			separatorXCoordinate++
 		}
 
