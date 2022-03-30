@@ -135,22 +135,43 @@ func (self *Grid) setHelper(item GridItem, parentWidthRatio, parentHeightRatio f
 }
 
 func (self *Grid) Draw(buf *Buffer) {
-	width := float64(self.Dx()) + 1
-	height := float64(self.Dy()) + 1
+
+	blockWidth := float64(self.Dx()) + 1
+	blockHeight := float64(self.Dy()) + 1
+	blockX := self.Min.X
+	blockY := self.Min.Y
+	// Grid is a special case where we use the full height width if no border is set, but if it is set
+	// we draw things inside the border (and possibly the title)
+	if self.Block.Border {
+		self.Block.Draw(buf)
+		blockWidth = float64(self.Inner.Dx()) + 1
+		blockHeight = float64(self.Inner.Dy()) + 1
+		blockX = self.Inner.Min.X
+		blockY = self.Inner.Min.Y
+	}
 
 	for _, item := range self.Items {
 		entry, _ := item.Entry.(Drawable)
 
-		x := int(math.Round(width*item.XRatio)) + self.Min.X
-		y := int(math.Round(height*item.YRatio)) + self.Min.Y
-		w := int(math.Round(width * item.WidthRatio))
-		h := int(math.Round(height * item.HeightRatio))
+		x := int(math.Round(blockWidth*item.XRatio)) + blockX
+		y := int(math.Round(blockHeight*item.YRatio)) + blockY
+		w := int(math.Round(blockWidth * item.WidthRatio))
+		h := int(math.Round(blockHeight * item.HeightRatio))
 
-		if x+w > self.Dx() {
-			w--
-		}
-		if y+h > self.Dy() {
-			h--
+		if self.Border {
+			if x+w > self.Inner.Dx() {
+				w--
+			}
+			if y+h > self.Inner.Dy() {
+				h--
+			}
+		} else {
+			if x+w > self.Dx() {
+				w--
+			}
+			if y+h > self.Dy() {
+				h--
+			}
 		}
 
 		entry.SetRect(x, y, x+w, y+h)
