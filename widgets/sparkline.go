@@ -51,9 +51,9 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 		barHeight := sparklineHeight
 		if i == len(self.Sparklines)-1 {
 			heightOffset = self.Inner.Dy()
-			barHeight = self.Inner.Dy() - (sparklineHeight * i)
+			barHeight = self.Inner.Dy() - (sparklineHeight * i) - 1
 		}
-		if sl.Title != "" {
+		if sl.Title != "" && i != len(self.Sparklines)-1 {
 			barHeight--
 		}
 
@@ -67,19 +67,17 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 			data := sl.Data[j]
 			height := int((data / maxVal) * float64(barHeight))
 			sparkChar := BARS[len(BARS)-1]
-			for k := 0; k < height; k++ {
+			for k := 0; k < height+1; k++ {
 				buf.SetCell(
 					NewCell(sparkChar, NewStyle(sl.LineColor)),
 					image.Pt(j+self.Inner.Min.X, self.Inner.Min.Y-1+heightOffset-k),
 				)
 			}
-			if height == 0 {
-				sparkChar = BARS[1]
-				buf.SetCell(
-					NewCell(sparkChar, NewStyle(sl.LineColor)),
-					image.Pt(j+self.Inner.Min.X, self.Inner.Min.Y-1+heightOffset),
-				)
-			}
+			lastHeight := int((data/maxVal)*float64(barHeight*8)) % 8
+			buf.SetCell(
+				NewCell(BARS[lastHeight], NewStyle(sl.LineColor)),
+				image.Pt(j+self.Inner.Min.X, self.Inner.Min.Y-1+heightOffset-height),
+			)
 		}
 
 		if sl.Title != "" {
