@@ -81,10 +81,7 @@ func (self *Block) Draw(buf *Buffer) {
 	if self.Border {
 		self.drawBorder(buf)
 	}
-	title := self.Title
-	if len(title) > self.Max.X-4 {
-		title = title[:self.Max.X-4] + string(ELLIPSES)
-	}
+	title := TrimString(self.Title, self.Max.X-4)
 	buf.SetString(
 		title,
 		self.TitleStyle,
