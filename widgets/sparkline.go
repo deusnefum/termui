@@ -6,6 +6,7 @@ package widgets
 
 import (
 	"image"
+	"math"
 
 	. "github.com/deusnefum/termui/v3"
 )
@@ -65,6 +66,9 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 		// draw line
 		for j := 0; j < len(sl.Data) && j < self.Inner.Dx(); j++ {
 			data := sl.Data[j]
+			if math.IsNaN(data) {
+				data = 0
+			}
 			height := int((data / maxVal) * float64(barHeight))
 			sparkChar := BARS[len(BARS)-1]
 			for k := 0; k < height+1; k++ {
@@ -73,7 +77,11 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 					image.Pt(j+self.Inner.Min.X, self.Inner.Min.Y-1+heightOffset-k),
 				)
 			}
-			lastHeight := int((data/maxVal)*float64(barHeight*8)) % 8
+			heightBlocksCnt := len(BARS) - 1
+			lastHeight := int((data/maxVal)*float64(barHeight*heightBlocksCnt)) % heightBlocksCnt
+			if lastHeight == 0 {
+				lastHeight = 1
+			}
 			buf.SetCell(
 				NewCell(BARS[lastHeight], NewStyle(sl.LineColor)),
 				image.Pt(j+self.Inner.Min.X, self.Inner.Min.Y-1+heightOffset-height),
