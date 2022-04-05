@@ -7,6 +7,7 @@ package widgets
 import (
 	"fmt"
 	"image"
+	"math"
 
 	. "github.com/deusnefum/termui/v3"
 )
@@ -21,16 +22,20 @@ type Plot struct {
 	Data       [][]float64
 	DataLabels []string
 	MaxVal     float64
+	MinVal     float64
 
-	LineColors []Color
-	AxesColor  Color // TODO
-	ShowAxes   bool
+	LineColors  []Color
+	AxesColor   Color // TODO
+	ShowAxes    bool
+	YAxisFormat string
 
 	Marker          PlotMarker
 	DotMarkerRune   rune
 	PlotType        PlotType
-	HorizontalScale int
+	HorizontalScale float64
 	DrawDirection   DrawDirection // TODO
+
+	yAxisLabelsWidth int
 }
 
 const (
@@ -38,6 +43,7 @@ const (
 	yAxisLabelsWidth  = 4
 	xAxisLabelsGap    = 2
 	yAxisLabelsGap    = 1
+	axisFormat        = "%.2f"
 )
 
 type PlotType uint
@@ -63,20 +69,22 @@ const (
 
 func NewPlot() *Plot {
 	return &Plot{
-		Block:           *NewBlock(),
-		LineColors:      Theme.Plot.Lines,
-		AxesColor:       Theme.Plot.Axes,
-		Marker:          MarkerBraille,
-		DotMarkerRune:   DOT,
-		Data:            [][]float64{},
-		HorizontalScale: 1,
-		DrawDirection:   DrawRight,
-		ShowAxes:        true,
-		PlotType:        LineChart,
+		Block:            *NewBlock(),
+		LineColors:       Theme.Plot.Lines,
+		AxesColor:        Theme.Plot.Axes,
+		Marker:           MarkerBraille,
+		DotMarkerRune:    DOT,
+		Data:             [][]float64{},
+		HorizontalScale:  1,
+		DrawDirection:    DrawRight,
+		ShowAxes:         true,
+		PlotType:         LineChart,
+		YAxisFormat:      axisFormat,
+		yAxisLabelsWidth: yAxisLabelsWidth,
 	}
 }
 
-func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal float64) {
+func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal, minVal float64) {
 	canvas := NewCanvas()
 	canvas.Rectangle = drawArea
 
@@ -84,10 +92,10 @@ func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal fl
 	case ScatterPlot:
 		for i, line := range self.Data {
 			for j, val := range line {
-				height := int((val / maxVal) * float64(drawArea.Dy()-1))
+				height := int(((val - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
 				canvas.SetPoint(
 					image.Pt(
-						(drawArea.Min.X+(j*self.HorizontalScale))*2,
+						(drawArea.Min.X+(int(math.Round(float64(j)*self.HorizontalScale))))*2,
 						(drawArea.Max.Y-height-1)*4,
 					),
 					SelectColor(self.LineColors, i),
@@ -96,16 +104,16 @@ func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal fl
 		}
 	case LineChart:
 		for i, line := range self.Data {
-			previousHeight := int((line[1] / maxVal) * float64(drawArea.Dy()-1))
+			previousHeight := int(((line[0] - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
 			for j, val := range line[1:] {
-				height := int((val / maxVal) * float64(drawArea.Dy()-1))
+				height := int(((val - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
 				canvas.SetLine(
 					image.Pt(
-						(drawArea.Min.X+(j*self.HorizontalScale))*2,
+						(drawArea.Min.X+(int(math.Round(float64(j)*self.HorizontalScale))))*2,
 						(drawArea.Max.Y-previousHeight-1)*4,
 					),
 					image.Pt(
-						(drawArea.Min.X+((j+1)*self.HorizontalScale))*2,
+						(drawArea.Min.X+(int(math.Round(float64(j+1)*self.HorizontalScale))))*2,
 						(drawArea.Max.Y-height-1)*4,
 					),
 					SelectColor(self.LineColors, i),
@@ -118,13 +126,13 @@ func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal fl
 	canvas.Draw(buf)
 }
 
-func (self *Plot) renderDot(buf *Buffer, drawArea image.Rectangle, maxVal float64) {
+func (self *Plot) renderDot(buf *Buffer, drawArea image.Rectangle, maxVal, minVal float64) {
 	switch self.PlotType {
 	case ScatterPlot:
 		for i, line := range self.Data {
 			for j, val := range line {
-				height := int((val / maxVal) * float64(drawArea.Dy()-1))
-				point := image.Pt(drawArea.Min.X+(j*self.HorizontalScale), drawArea.Max.Y-1-height)
+				height := int(((val - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
+				point := image.Pt(drawArea.Min.X+(int(math.Round(float64(j)*self.HorizontalScale))), drawArea.Max.Y-1-height)
 				if point.In(drawArea) {
 					buf.SetCell(
 						NewCell(self.DotMarkerRune, NewStyle(SelectColor(self.LineColors, i))),
@@ -135,26 +143,26 @@ func (self *Plot) renderDot(buf *Buffer, drawArea image.Rectangle, maxVal float6
 		}
 	case LineChart:
 		for i, line := range self.Data {
-			for j := 0; j < len(line) && j*self.HorizontalScale < drawArea.Dx(); j++ {
+			for j := 0; j < len(line) && int(math.Round(float64(j)*self.HorizontalScale)) < drawArea.Dx(); j++ {
 				val := line[j]
-				height := int((val / maxVal) * float64(drawArea.Dy()-1))
+				height := int((val / (maxVal - minVal)) * float64(drawArea.Dy()-1))
 				buf.SetCell(
 					NewCell(self.DotMarkerRune, NewStyle(SelectColor(self.LineColors, i))),
-					image.Pt(drawArea.Min.X+(j*self.HorizontalScale), drawArea.Max.Y-1-height),
+					image.Pt(drawArea.Min.X+(int(math.Round(float64(j)*self.HorizontalScale))), drawArea.Max.Y-1-height),
 				)
 			}
 		}
 	}
 }
 
-func (self *Plot) plotAxes(buf *Buffer, maxVal float64) {
+func (self *Plot) plotAxes(buf *Buffer, maxVal, minVal float64) {
 	// draw origin cell
 	buf.SetCell(
 		NewCell(BOTTOM_LEFT, NewStyle(ColorWhite)),
-		image.Pt(self.Inner.Min.X+yAxisLabelsWidth, self.Inner.Max.Y-xAxisLabelsHeight-1),
+		image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, self.Inner.Max.Y-xAxisLabelsHeight-1),
 	)
 	// draw x axis line
-	for i := yAxisLabelsWidth + 1; i < self.Inner.Dx(); i++ {
+	for i := self.yAxisLabelsWidth + 1; i < self.Inner.Dx(); i++ {
 		buf.SetCell(
 			NewCell(HORIZONTAL_DASH, NewStyle(ColorWhite)),
 			image.Pt(i+self.Inner.Min.X, self.Inner.Max.Y-xAxisLabelsHeight-1),
@@ -164,7 +172,7 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal float64) {
 	for i := 0; i < self.Inner.Dy()-xAxisLabelsHeight-1; i++ {
 		buf.SetCell(
 			NewCell(VERTICAL_DASH, NewStyle(ColorWhite)),
-			image.Pt(self.Inner.Min.X+yAxisLabelsWidth, i+self.Inner.Min.Y),
+			image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, i+self.Inner.Min.Y),
 		)
 	}
 	// draw x axis labels
@@ -172,29 +180,30 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal float64) {
 	buf.SetString(
 		"0",
 		NewStyle(ColorWhite),
-		image.Pt(self.Inner.Min.X+yAxisLabelsWidth, self.Inner.Max.Y-1),
+		image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, self.Inner.Max.Y-1),
 	)
 	// draw rest
 	if self.HorizontalScale == 0 {
 		return
 	}
-	for x := self.Inner.Min.X + yAxisLabelsWidth + (xAxisLabelsGap)*self.HorizontalScale + 1; x < self.Inner.Max.X-1; {
+	// TODO: use floats everywhere and just convert back to int when done
+	for x := self.Inner.Min.X + self.yAxisLabelsWidth + int(math.Round(float64(xAxisLabelsGap)*self.HorizontalScale)) + 1; x < self.Inner.Max.X-1; {
 		label := fmt.Sprintf(
 			"%d",
-			(x-(self.Inner.Min.X+yAxisLabelsWidth)-1)/(self.HorizontalScale)+1,
+			int((float64(x)-float64(self.Inner.Min.X+self.yAxisLabelsWidth)-1)/(self.HorizontalScale)+1),
 		)
 		buf.SetString(
 			label,
 			NewStyle(ColorWhite),
 			image.Pt(x, self.Inner.Max.Y-1),
 		)
-		x += (len(label) + xAxisLabelsGap) * self.HorizontalScale
+		x += int(float64((len(label) + xAxisLabelsGap)) * self.HorizontalScale)
 	}
 	// draw y axis labels
-	verticalScale := maxVal / float64(self.Inner.Dy()-xAxisLabelsHeight-1)
+	verticalScale := (maxVal - minVal) / float64(self.Inner.Dy()-xAxisLabelsHeight-1)
 	for i := 0; i*(yAxisLabelsGap+1) < self.Inner.Dy()-1; i++ {
 		buf.SetString(
-			fmt.Sprintf("%.2f", float64(i)*verticalScale*(yAxisLabelsGap+1)),
+			fmt.Sprintf(self.YAxisFormat, (float64(i))*verticalScale*(yAxisLabelsGap+1)+minVal),
 			NewStyle(ColorWhite),
 			image.Pt(self.Inner.Min.X, self.Inner.Max.Y-(i*(yAxisLabelsGap+1))-2),
 		)
@@ -208,23 +217,28 @@ func (self *Plot) Draw(buf *Buffer) {
 	if maxVal == 0 {
 		maxVal, _ = GetMaxFloat64From2dSlice(self.Data)
 	}
+	minVal := self.MinVal
+	if minVal == 0 {
+		minVal, _ = GetMinFloat64From2dSlice(self.Data)
+	}
 
 	if self.ShowAxes {
-		self.plotAxes(buf, maxVal)
+		self.yAxisLabelsWidth = len(fmt.Sprintf(self.YAxisFormat, maxVal))
+		self.plotAxes(buf, maxVal, minVal)
 	}
 
 	drawArea := self.Inner
 	if self.ShowAxes {
 		drawArea = image.Rect(
-			self.Inner.Min.X+yAxisLabelsWidth+1, self.Inner.Min.Y,
+			self.Inner.Min.X+self.yAxisLabelsWidth+1, self.Inner.Min.Y,
 			self.Inner.Max.X, self.Inner.Max.Y-xAxisLabelsHeight-1,
 		)
 	}
 
 	switch self.Marker {
 	case MarkerBraille:
-		self.renderBraille(buf, drawArea, maxVal)
+		self.renderBraille(buf, drawArea, maxVal, minVal)
 	case MarkerDot:
-		self.renderDot(buf, drawArea, maxVal)
+		self.renderDot(buf, drawArea, maxVal, minVal)
 	}
 }
