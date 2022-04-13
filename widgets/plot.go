@@ -26,6 +26,7 @@ type Plot struct {
 
 	LineColors  []Color
 	AxesColor   Color // TODO
+	LabelStyle  Style
 	ShowAxes    bool
 	YAxisFormat string
 
@@ -78,6 +79,7 @@ func NewPlot() *Plot {
 		HorizontalScale:  1,
 		DrawDirection:    DrawRight,
 		ShowAxes:         true,
+		LabelStyle:       NewStyle(ColorClear),
 		PlotType:         LineChart,
 		YAxisFormat:      axisFormat,
 		yAxisLabelsWidth: yAxisLabelsWidth,
@@ -158,20 +160,20 @@ func (self *Plot) renderDot(buf *Buffer, drawArea image.Rectangle, maxVal, minVa
 func (self *Plot) plotAxes(buf *Buffer, maxVal, minVal float64) {
 	// draw origin cell
 	buf.SetCell(
-		NewCell(BOTTOM_LEFT, NewStyle(ColorWhite)),
+		NewCell(BOTTOM_LEFT, NewStyle(self.AxesColor)),
 		image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, self.Inner.Max.Y-xAxisLabelsHeight-1),
 	)
 	// draw x axis line
 	for i := self.yAxisLabelsWidth + 1; i < self.Inner.Dx(); i++ {
 		buf.SetCell(
-			NewCell(HORIZONTAL_DASH, NewStyle(ColorWhite)),
+			NewCell(HORIZONTAL_DASH, NewStyle(self.AxesColor)),
 			image.Pt(i+self.Inner.Min.X, self.Inner.Max.Y-xAxisLabelsHeight-1),
 		)
 	}
 	// draw y axis line
 	for i := 0; i < self.Inner.Dy()-xAxisLabelsHeight-1; i++ {
 		buf.SetCell(
-			NewCell(VERTICAL_DASH, NewStyle(ColorWhite)),
+			NewCell(VERTICAL_DASH, NewStyle(self.AxesColor)),
 			image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, i+self.Inner.Min.Y),
 		)
 	}
@@ -179,7 +181,7 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal, minVal float64) {
 	// draw 0
 	buf.SetString(
 		"0",
-		NewStyle(ColorWhite),
+		self.LabelStyle,
 		image.Pt(self.Inner.Min.X+self.yAxisLabelsWidth, self.Inner.Max.Y-1),
 	)
 	// draw rest
@@ -194,7 +196,7 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal, minVal float64) {
 		)
 		buf.SetString(
 			label,
-			NewStyle(ColorWhite),
+			self.LabelStyle,
 			image.Pt(x, self.Inner.Max.Y-1),
 		)
 		x += int(float64((len(label) + xAxisLabelsGap)) * self.HorizontalScale)
@@ -204,7 +206,7 @@ func (self *Plot) plotAxes(buf *Buffer, maxVal, minVal float64) {
 	for i := 0; i*(yAxisLabelsGap+1) < self.Inner.Dy()-1; i++ {
 		buf.SetString(
 			fmt.Sprintf(self.YAxisFormat, (float64(i))*verticalScale*(yAxisLabelsGap+1)+minVal),
-			NewStyle(ColorWhite),
+			self.LabelStyle,
 			image.Pt(self.Inner.Min.X, self.Inner.Max.Y-(i*(yAxisLabelsGap+1))-2),
 		)
 	}
