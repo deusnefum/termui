@@ -96,13 +96,13 @@ func (self *Block) Draw(buf *Buffer) {
 		buf.SetString(
 			title,
 			self.TitleStyle,
-			image.Pt((self.Max.X-rw.StringWidth(title))/2, self.Min.Y),
+			image.Pt(self.Min.X+((self.Max.X-self.Min.X)-rw.StringWidth(title))/2, self.Min.Y),
 		)
 	case AlignRight:
 		buf.SetString(
 			title,
 			self.TitleStyle,
-			image.Pt((self.Max.X-rw.StringWidth(title))-2, self.Min.Y),
+			image.Pt(self.Max.X-rw.StringWidth(title)-2, self.Min.Y),
 		)
 	}
 }
