@@ -7,6 +7,8 @@ package termui
 import (
 	"image"
 	"sync"
+
+	rw "github.com/mattn/go-runewidth"
 )
 
 // Block is the base struct inherited by most widgets.
@@ -24,8 +26,9 @@ type Block struct {
 	image.Rectangle
 	Inner image.Rectangle
 
-	Title      string
-	TitleStyle Style
+	Title          string
+	TitleStyle     Style
+	TitleAlignment Alignment
 
 	sync.Mutex
 }
@@ -82,11 +85,26 @@ func (self *Block) Draw(buf *Buffer) {
 		self.drawBorder(buf)
 	}
 	title := TrimString(self.Title, self.Max.X-4)
-	buf.SetString(
-		title,
-		self.TitleStyle,
-		image.Pt(self.Min.X+2, self.Min.Y),
-	)
+	switch self.TitleAlignment {
+	case AlignLeft:
+		buf.SetString(
+			title,
+			self.TitleStyle,
+			image.Pt(self.Min.X+2, self.Min.Y),
+		)
+	case AlignCenter:
+		buf.SetString(
+			title,
+			self.TitleStyle,
+			image.Pt((self.Max.X-rw.StringWidth(title))/2, self.Min.Y),
+		)
+	case AlignRight:
+		buf.SetString(
+			title,
+			self.TitleStyle,
+			image.Pt((self.Max.X-rw.StringWidth(title))-2, self.Min.Y),
+		)
+	}
 }
 
 // SetRect implements the Drawable interface.
