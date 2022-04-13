@@ -84,7 +84,8 @@ func (self *Block) Draw(buf *Buffer) {
 	if self.Border {
 		self.drawBorder(buf)
 	}
-	title := TrimString(self.Title, self.Max.X-4)
+	width := self.Max.X - self.Min.X
+	title := TrimString(self.Title, width-4)
 	switch self.TitleAlignment {
 	case AlignLeft:
 		buf.SetString(
@@ -96,7 +97,7 @@ func (self *Block) Draw(buf *Buffer) {
 		buf.SetString(
 			title,
 			self.TitleStyle,
-			image.Pt(self.Min.X+((self.Max.X-self.Min.X)-rw.StringWidth(title))/2, self.Min.Y),
+			image.Pt(self.Min.X+(width-rw.StringWidth(title))/2, self.Min.Y),
 		)
 	case AlignRight:
 		buf.SetString(
