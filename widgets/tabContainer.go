@@ -5,6 +5,7 @@
 package widgets
 
 import (
+	"fmt"
 	"strconv"
 
 	. "github.com/deusnefum/termui/v3"
@@ -15,19 +16,21 @@ import (
 // The currently selected tab can be found through the `ActiveTabIndex` field.
 type TabContainer struct {
 	Block
-	ActiveTabIndex   int
-	ActiveTabStyle   Style
-	InactiveTabStyle Style
-	Tabs             []Drawable
-	TabTitles        []string
+	ActiveTabIndex    int
+	ActiveTabStyleStr string
+	ActiveTabStyle    Style
+	InactiveTabStyle  Style
+	Tabs              []Drawable
+	TabTitles         []string
 }
 
 func NewTabContainer(tabs ...Drawable) *TabContainer {
 	return &TabContainer{
-		Block:            *NewBlock(),
-		Tabs:             tabs,
-		ActiveTabStyle:   Theme.Tab.Active,
-		InactiveTabStyle: Theme.Tab.Inactive,
+		Block:             *NewBlock(),
+		Tabs:              tabs,
+		ActiveTabStyleStr: "mod:reverse",
+		ActiveTabStyle:    Theme.Tab.Active,
+		InactiveTabStyle:  Theme.Tab.Inactive,
 	}
 }
 
@@ -52,7 +55,7 @@ func (self *TabContainer) Draw(buf *Buffer) {
 	for i := range self.Tabs {
 		left, right := "  ", "  "
 		if i == self.ActiveTabIndex {
-			left, right = " [", "] "
+			left, right = " [[", fmt.Sprintf("]](%s) ", self.ActiveTabStyleStr)
 		}
 
 		if i < len(self.TabTitles) {

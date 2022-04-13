@@ -74,3 +74,9 @@ func (self *Buffer) SetString(s string, style Style, p image.Point) {
 		x += rw.RuneWidth(char)
 	}
 }
+
+func (self *Buffer) SetCells(c []Cell, p image.Point) {
+	for i, c := range c {
+		self.SetCell(c, image.Pt(p.X+i, p.Y))
+	}
+}

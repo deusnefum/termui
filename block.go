@@ -7,8 +7,6 @@ package termui
 import (
 	"image"
 	"sync"
-
-	rw "github.com/mattn/go-runewidth"
 )
 
 // Block is the base struct inherited by most widgets.
@@ -85,25 +83,28 @@ func (self *Block) Draw(buf *Buffer) {
 		self.drawBorder(buf)
 	}
 	width := self.Max.X - self.Min.X
-	title := TrimString(self.Title, width-4)
+
+	titleCells := ParseStyles(self.Title, self.TitleStyle)
+	if len(titleCells) > width-4 {
+		titleCells = titleCells[:width-3]
+		titleCells[width-4] = Cell{ELLIPSES, self.TitleStyle}
+	}
+
 	switch self.TitleAlignment {
 	case AlignLeft:
-		buf.SetString(
-			title,
-			self.TitleStyle,
+		buf.SetCells(
+			titleCells,
 			image.Pt(self.Min.X+2, self.Min.Y),
 		)
 	case AlignCenter:
-		buf.SetString(
-			title,
-			self.TitleStyle,
-			image.Pt(self.Min.X+(width-rw.StringWidth(title))/2, self.Min.Y),
+		buf.SetCells(
+			titleCells,
+			image.Pt(self.Min.X+(width-len(titleCells))/2, self.Min.Y),
 		)
 	case AlignRight:
-		buf.SetString(
-			title,
-			self.TitleStyle,
-			image.Pt(self.Max.X-rw.StringWidth(title)-2, self.Min.Y),
+		buf.SetCells(
+			titleCells,
+			image.Pt(self.Max.X-len(titleCells)-2, self.Min.Y),
 		)
 	}
 }
