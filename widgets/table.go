@@ -48,6 +48,10 @@ func (self *Table) Draw(buf *Buffer) {
 
 	self.ColumnResizer()
 
+	if len(self.Rows) == 0 {
+		return
+	}
+
 	columnWidths := self.ColumnWidths
 	if len(columnWidths) == 0 {
 		columnCount := len(self.Rows[0])
