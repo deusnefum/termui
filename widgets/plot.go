@@ -25,7 +25,7 @@ type Plot struct {
 	MinVal     float64
 
 	LineColors  []Color
-	AxesColor   Color // TODO
+	AxesColor   Color
 	LabelStyle  Style
 	ShowAxes    bool
 	YAxisFormat string
@@ -90,6 +90,11 @@ func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal, m
 	canvas := NewCanvas()
 	canvas.Rectangle = drawArea
 
+	// don't do anything if there's no data
+	if self.Data == nil || len(self.Data) == 0 {
+		return
+	}
+
 	switch self.PlotType {
 	case ScatterPlot:
 		for i, line := range self.Data {
@@ -106,6 +111,10 @@ func (self *Plot) renderBraille(buf *Buffer, drawArea image.Rectangle, maxVal, m
 		}
 	case LineChart:
 		for i, line := range self.Data {
+			// skip plotting a line with fewer than 2 data points
+			if len(line) < 2 {
+				continue
+			}
 			previousHeight := int(((line[0] - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
 			for j, val := range line[1:] {
 				height := int(((val - minVal) / (maxVal - minVal)) * float64(drawArea.Dy()-1))
