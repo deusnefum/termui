@@ -6,7 +6,6 @@ package widgets
 
 import (
 	"fmt"
-	"strconv"
 
 	. "github.com/deusnefum/termui/v3"
 )
@@ -34,6 +33,10 @@ func NewTabContainer(tabs ...Drawable) *TabContainer {
 	}
 }
 
+func (self *TabContainer) ActiveTab() Drawable {
+	return self.Tabs[self.ActiveTabIndex]
+}
+
 func (self *TabContainer) FocusLeft() {
 	if self.ActiveTabIndex > 0 {
 		self.ActiveTabIndex--
@@ -58,10 +61,10 @@ func (self *TabContainer) Draw(buf *Buffer) {
 			left, right = " [[", fmt.Sprintf("]](%s) ", self.ActiveTabStyleStr)
 		}
 
-		if i < len(self.TabTitles) {
+		if i < len(self.TabTitles) && self.TabTitles[i] != "" {
 			self.Title += left + self.TabTitles[i] + right
 		} else {
-			self.Title += left + strconv.Itoa(i) + right
+			self.Title += left + self.Tabs[i].GetTitle() + right
 		}
 		if i != len(self.Tabs)-1 {
 			self.Title += string(VERTICAL_LINE)
