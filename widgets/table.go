@@ -21,13 +21,14 @@ import (
 */
 type Table struct {
 	Block
-	Rows          [][]string
-	ColumnWidths  []int
-	TextStyle     Style
-	RowSeparator  bool
-	TextAlignment Alignment
-	RowStyles     map[int]Style
-	FillRow       bool
+	Rows            [][]string
+	ColumnWidths    []int
+	TextStyle       Style
+	RowSeparator    bool
+	TextAlignment   Alignment
+	ColumnAlignment []Alignment
+	RowStyles       map[int]Style
+	FillRow         bool
 
 	// ColumnResizer is called on each Draw. Can be used for custom column sizing.
 	ColumnResizer func()
@@ -82,8 +83,15 @@ func (self *Table) Draw(buf *Buffer) {
 		// draw row cells
 		for j := 0; j < len(row); j++ {
 			col := ParseStyles(row[j], rowStyle)
+			colAlign := self.TextAlignment
+			if j < len(self.ColumnAlignment) {
+				colAlign = self.ColumnAlignment[j]
+			} else {
+				colAlign = self.TextAlignment
+			}
 			// draw row cell
-			if len(col) > columnWidths[j] || self.TextAlignment == AlignLeft {
+			switch {
+			case len(col) > columnWidths[j] || colAlign == AlignLeft:
 				for _, cx := range BuildCellWithXArray(col) {
 					k, cell := cx.X, cx.Cell
 					if k == columnWidths[j] || colXCoordinate+k == self.Inner.Max.X {
@@ -94,14 +102,14 @@ func (self *Table) Draw(buf *Buffer) {
 						buf.SetCell(cell, image.Pt(colXCoordinate+k, yCoordinate))
 					}
 				}
-			} else if self.TextAlignment == AlignCenter {
+			case colAlign == AlignCenter:
 				xCoordinateOffset := (columnWidths[j] - len(col)) / 2
 				stringXCoordinate := xCoordinateOffset + colXCoordinate
 				for _, cx := range BuildCellWithXArray(col) {
 					k, cell := cx.X, cx.Cell
 					buf.SetCell(cell, image.Pt(stringXCoordinate+k, yCoordinate))
 				}
-			} else if self.TextAlignment == AlignRight {
+			case colAlign == AlignRight:
 				stringXCoordinate := MinInt(colXCoordinate+columnWidths[j], self.Inner.Max.X) - len(col)
 				for _, cx := range BuildCellWithXArray(col) {
 					k, cell := cx.X, cx.Cell
