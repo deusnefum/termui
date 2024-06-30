@@ -3,9 +3,10 @@ module github.com/deusnefum/termui/v3
 go 1.15
 
 require (
-	github.com/mattn/go-runewidth v0.0.13
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7
+	github.com/mattn/go-runewidth v0.0.15
+	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/nsf/termbox-go v1.1.1
+	github.com/rivo/uniseg v0.4.4 // indirect
 )
 
 replace github.com/deusnefum/termui/v3 => ./

@@ -18,7 +18,7 @@ type Sparkline struct {
 	TitleStyle Style
 	LineColor  Color
 	MaxVal     float64
-	MaxHeight  int // TODO
+	MaxHeight  int
 }
 
 // SparklineGroup is a renderable widget which groups together the given sparklines.
@@ -70,6 +70,9 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 				data = 0
 			}
 			height := int((data / maxVal) * float64(barHeight))
+			if height > sl.MaxHeight {
+				height = sl.MaxHeight
+			}
 			sparkChar := BARS[len(BARS)-1]
 			for k := 0; k < height+1; k++ {
 				buf.SetCell(
