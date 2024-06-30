@@ -15,6 +15,7 @@ import (
 // Custom widgets will override the Draw method.
 type Block struct {
 	Border      bool
+	BorderRound bool
 	BorderStyle Style
 
 	BorderLeft, BorderRight, BorderTop, BorderBottom bool
@@ -30,7 +31,7 @@ type Block struct {
 	ShowTitle      bool
 
 	// Dirty is a bool to track whether or not unrendered changes have been made
-	// to a block--it is up to the user too manage this
+	// to a block--it is up to the user to manage this
 	Dirty bool
 
 	sync.Mutex
@@ -70,16 +71,32 @@ func (self *Block) drawBorder(buf *Buffer) {
 
 	// draw corners
 	if self.BorderTop && self.BorderLeft {
-		buf.SetCell(Cell{TOP_LEFT, self.BorderStyle}, self.Min)
+		if self.BorderRound {
+			buf.SetCell(Cell{TOP_LEFT_ROUND, self.BorderStyle}, self.Min)
+		} else {
+			buf.SetCell(Cell{TOP_LEFT, self.BorderStyle}, self.Min)
+		}
 	}
 	if self.BorderTop && self.BorderRight {
-		buf.SetCell(Cell{TOP_RIGHT, self.BorderStyle}, image.Pt(self.Max.X-1, self.Min.Y))
+		if self.BorderRound {
+			buf.SetCell(Cell{TOP_RIGHT_ROUND, self.BorderStyle}, self.Min)
+		} else {
+			buf.SetCell(Cell{TOP_RIGHT, self.BorderStyle}, image.Pt(self.Max.X-1, self.Min.Y))
+		}
 	}
 	if self.BorderBottom && self.BorderLeft {
-		buf.SetCell(Cell{BOTTOM_LEFT, self.BorderStyle}, image.Pt(self.Min.X, self.Max.Y-1))
+		if self.BorderRound {
+			buf.SetCell(Cell{BOTTOM_LEFT_ROUND, self.BorderStyle}, self.Min)
+		} else {
+			buf.SetCell(Cell{BOTTOM_LEFT, self.BorderStyle}, image.Pt(self.Min.X, self.Max.Y-1))
+		}
 	}
 	if self.BorderBottom && self.BorderRight {
-		buf.SetCell(Cell{BOTTOM_RIGHT, self.BorderStyle}, self.Max.Sub(image.Pt(1, 1)))
+		if self.BorderRound {
+			buf.SetCell(Cell{BOTTOM_RIGHT_ROUND, self.BorderStyle}, self.Min)
+		} else {
+			buf.SetCell(Cell{BOTTOM_RIGHT, self.BorderStyle}, self.Max.Sub(image.Pt(1, 1)))
+		}
 	}
 }
 

@@ -2,15 +2,20 @@
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
+//go:build !windows
 // +build !windows
 
 package termui
 
 const (
-	TOP_LEFT     = '┌'
-	TOP_RIGHT    = '┐'
-	BOTTOM_LEFT  = '└'
-	BOTTOM_RIGHT = '┘'
+	TOP_LEFT           = '┌'
+	TOP_RIGHT          = '┐'
+	BOTTOM_LEFT        = '└'
+	BOTTOM_RIGHT       = '┘'
+	TOP_LEFT_ROUND     = '╭'
+	TOP_RIGHT_ROUND    = '╮'
+	BOTTOM_LEFT_ROUND  = '╰'
+	BOTTOM_RIGHT_ROUND = '╯'
 
 	VERTICAL_LINE   = '│'
 	HORIZONTAL_LINE = '─'
