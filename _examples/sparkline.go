@@ -2,12 +2,14 @@
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
+//go:build ignore
 // +build ignore
 
 package main
 
 import (
 	"log"
+	"math"
 
 	ui "github.com/deusnefum/termui/v3"
 	"github.com/deusnefum/termui/v3/widgets"
@@ -19,7 +21,7 @@ func main() {
 	}
 	defer ui.Close()
 
-	data := []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
+	data := []float64{4, 2, 1, 6, 3, math.NaN(), 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
 
 	sl0 := widgets.NewSparkline()
 	sl0.Data = data[3:]

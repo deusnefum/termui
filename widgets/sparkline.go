@@ -78,9 +78,9 @@ func (self *SparklineGroup) Draw(buf *Buffer) {
 				)
 			}
 			heightBlocksCnt := len(BARS) - 1
-			lastHeight := int((data/maxVal)*float64(barHeight*heightBlocksCnt)) % heightBlocksCnt
+			lastHeight := int((data/maxVal)*math.Abs(float64(barHeight*heightBlocksCnt))) % heightBlocksCnt
 			// prevent gaps from showing if at bottom of sparkline
-			if lastHeight == 0 && height == 0 {
+			if lastHeight == 0 && height == 0 || lastHeight < 0 {
 				lastHeight = 1
 			}
 			buf.SetCell(

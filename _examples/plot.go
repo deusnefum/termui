@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
+//go:build ignore
 // +build ignore
 
 package main
@@ -26,8 +27,8 @@ func main() {
 		data[0] = make([]float64, n)
 		data[1] = make([]float64, n)
 		for i := 0; i < n; i++ {
-			data[0][i] = 1 + math.Sin(float64(i)/5)
-			data[1][i] = 1 + math.Cos(float64(i)/5)
+			data[0][i] = 100 * math.Sin(float64(i)/5)
+			data[1][i] = 100 * math.Cos(float64(i)/5)
 		}
 		return data
 	}()
@@ -36,8 +37,11 @@ func main() {
 	p0.Title = "braille-mode Line Chart"
 	p0.Data = sinData
 	p0.SetRect(0, 0, 50, 15)
-	p0.AxesColor = ui.ColorWhite
+	p0.AxesColor = ui.ColorBlue
 	p0.LineColors[0] = ui.ColorGreen
+	p0.YAxisFormat = "%+6.1f"
+	p0.LabelStyle = ui.NewStyle(ui.Color(23))
+	// p0.HorizontalScale = 2.5
 
 	p1 := widgets.NewPlot()
 	p1.Title = "dot-mode line Chart"

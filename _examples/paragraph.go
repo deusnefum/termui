@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
+//go:build ignore
 // +build ignore
 
 package main
@@ -28,6 +29,7 @@ func main() {
 	p1.Title = "标签"
 	p1.Text = "你好，世界。"
 	p1.SetRect(20, 0, 35, 5)
+	p1.ShowTitle = false
 
 	p2 := widgets.NewParagraph()
 	p2.Title = "Multiline"
@@ -47,6 +49,13 @@ func main() {
 	p4.BorderStyle.Fg = ui.ColorBlue
 
 	ui.Render(p0, p1, p2, p3, p4)
+
+	modal := widgets.NewParagraph()
+	modal.Title = "Quit?"
+	modal.Text = "The market is still open! Are you sure you want to quit? [Y/N] "
+	w, h := ui.TerminalDimensions()
+	modal.SetRect(w/3, h/3, w*2/3, h*2/3)
+	ui.Render(modal)
 
 	uiEvents := ui.PollEvents()
 	for {

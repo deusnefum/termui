@@ -27,6 +27,11 @@ type Block struct {
 	Title          string
 	TitleStyle     Style
 	TitleAlignment Alignment
+	ShowTitle      bool
+
+	// Dirty is a bool to track whether or not unrendered changes have been made
+	// to a block--it is up to the user too manage this
+	Dirty bool
 
 	sync.Mutex
 }
@@ -41,6 +46,7 @@ func NewBlock() *Block {
 		BorderBottom: true,
 
 		TitleStyle: Theme.Block.Title,
+		ShowTitle:  true,
 	}
 }
 
@@ -77,12 +83,28 @@ func (self *Block) drawBorder(buf *Buffer) {
 	}
 }
 
+func (self *Block) GetTitle() string {
+	return self.Title
+}
+
+func (self *Block) IsDirty() bool {
+	return self.Dirty
+}
+
+func (self *Block) Clean() {
+	self.Dirty = false
+}
+
 // Draw implements the Drawable interface.
 func (self *Block) Draw(buf *Buffer) {
 	if self.Border {
 		self.drawBorder(buf)
 	}
-	width := self.Max.X - self.Min.X
+	if !self.ShowTitle {
+		return
+	}
+
+	width := self.Dx()
 
 	titleCells := ParseStyles(self.Title, self.TitleStyle)
 	if len(titleCells) > width-4 {

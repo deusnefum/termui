@@ -43,6 +43,7 @@ func main() {
 	tabs.SetRect(2, 2, 50, 20)
 	tabs.Border = false
 	tabs.TitleAlignment = ui.AlignCenter
+	tabs.ActiveTabStyleStr = "fg:black,bg:white"
 	tabs.TabTitles = []string{"Info", "Chart"}
 
 	ui.Render(header, tabs)
