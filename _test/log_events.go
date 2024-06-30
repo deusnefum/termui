@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log"
 
-	ui "github.com/deusnefum/termui/v3"
+	ui "github.com/sparques/termui/v3"
 )
 
 // logs all events to the termui window

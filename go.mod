@@ -1,4 +1,4 @@
-module github.com/deusnefum/termui/v3
+module github.com/sparques/termui/v3
 
 go 1.15
 
@@ -9,4 +9,4 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 )
 
-replace github.com/deusnefum/termui/v3 => ./
+replace github.com/sparques/termui/v3 => ./

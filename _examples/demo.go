@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can
 // be found in the LICENSE file.
 
+//go:build ignore
 // +build ignore
 
 package main
@@ -11,8 +12,8 @@ import (
 	"math"
 	"time"
 
-	ui "github.com/deusnefum/termui/v3"
-	"github.com/deusnefum/termui/v3/widgets"
+	ui "github.com/sparques/termui/v3"
+	"github.com/sparques/termui/v3/widgets"
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	listData := []string{
-		"[0] deusnefum/termui",
+		"[0] sparques/termui",
 		"[1] editbox.go",
 		"[2] interrupt.go",
 		"[3] keyboard.go",
@@ -121,7 +122,7 @@ func main() {
 	p2.TextStyle.Fg = ui.ColorMagenta
 
 	draw := func(count int) {
-		g.Percent = count % 101
+		g.Percent = float64(count % 101)
 		l.Rows = listData[count%9:]
 		slg.Sparklines[0].Data = sparklineData[:30+count%50]
 		slg.Sparklines[1].Data = sparklineData[:35+count%50]

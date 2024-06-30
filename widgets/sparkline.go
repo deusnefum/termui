@@ -8,7 +8,7 @@ import (
 	"image"
 	"math"
 
-	. "github.com/deusnefum/termui/v3"
+	. "github.com/sparques/termui/v3"
 )
 
 // Sparkline is like: ▅▆▂▂▅▇▂▂▃▆▆▆▅▃. The data points should be non-negative integers.

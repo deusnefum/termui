@@ -7,7 +7,7 @@ package widgets
 import (
 	"image"
 
-	. "github.com/deusnefum/termui/v3"
+	. "github.com/sparques/termui/v3"
 )
 
 /*Table is like:

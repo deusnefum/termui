@@ -7,7 +7,7 @@ package widgets
 import (
 	"fmt"
 
-	. "github.com/deusnefum/termui/v3"
+	. "github.com/sparques/termui/v3"
 )
 
 // TabContainer is a renderable widget which can be used to conditionally render certain tabs/views.

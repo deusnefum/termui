@@ -7,8 +7,8 @@ import (
 	"log"
 	"strconv"
 
-	ui "github.com/deusnefum/termui/v3"
-	"github.com/deusnefum/termui/v3/widgets"
+	ui "github.com/sparques/termui/v3"
+	"github.com/sparques/termui/v3/widgets"
 )
 
 func main() {

@@ -28,7 +28,7 @@ It is not necessary to `go get` termui, since Go will automatically manage any i
 
 ### Dep
 
-Add with `dep ensure -add github.com/deusnefum/termui`. With Dep, `/v3` should *not* be included in the import statements.
+Add with `dep ensure -add github.com/sparques/termui`. With Dep, `/v3` should *not* be included in the import statements.
 
 ## Hello World
 
@@ -38,8 +38,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/deusnefum/termui/v3"
-	"github.com/deusnefum/termui/v3/widgets"
+	ui "github.com/sparques/termui/v3"
+	"github.com/sparques/termui/v3/widgets"
 )
 
 func main() {
@@ -82,7 +82,7 @@ Run an example with `go run _examples/{example}.go` or run each example consecut
 
 ## Documentation
 
-- [wiki](https://github.com/deusnefum/termui/wiki)
+- [wiki](https://github.com/sparques/termui/wiki)
 
 ## Uses
 
